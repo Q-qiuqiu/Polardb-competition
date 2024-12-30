@@ -1,0 +1,66 @@
+-- 1
+create index i1_1 on lineitem (l_returnflag,l_linestatus) include (l_quantity,l_extendedprice,l_discount,l_tax) where l_shipdate <= date '1998-08-05';
+
+-- 2
+CREATE INDEX i2_1 ON partsupp (ps_partkey, ps_suppkey) INCLUDE (ps_supplycost); --8，9也用
+CREATE INDEX i2_2 ON part (p_partkey) INCLUDE (p_size, p_type) WHERE p_size = 28 AND p_type LIKE '%COPPER'; --12-20修改，测试一下
+
+-- 3 
+create index i3_1 on customer (c_custkey) where c_mktsegment = 'BUILDING';
+create index i3_2 on orders (o_custkey) include (o_orderdate,o_shippriority) where o_orderdate < date '1995-03-07';
+create index i3_3 on lineitem (l_orderkey) include (l_extendedprice,l_discount) where l_shipdate > date '1995-03-07';
+
+-- 4 
+create index i4_1 on lineitem (l_orderkey) where l_commitdate < l_receiptdate; -- 12也会用到
+create index i4_2 on orders (o_orderpriority) where o_orderdate >= date '1994-02-01' and o_orderdate < date '1994-05-01';
+
+-- 5  
+create index i5_1 on orders (o_custkey) include (o_orderkey) where o_orderdate >= date '1993-01-01' and o_orderdate < date '1994-01-01';  
+CREATE INDEX i5_2 ON supplier (s_suppkey, s_nationkey);
+
+-- 6
+CREATE INDEX i6_1 ON lineitem (l_discount) INCLUDE (l_extendedprice, l_quantity) WHERE l_shipdate >= DATE '1993-01-01' AND l_shipdate < DATE '1994-01-01';
+
+-- 7
+CREATE INDEX i7_1 ON lineitem (l_suppkey) INCLUDE (l_extendedprice, l_shipdate, l_quantity) WHERE l_shipdate >= DATE '1995-01-01' AND l_shipdate < DATE '1996-12-31'; --12-20 7没有用到，真神奇
+create index i7_2 on nation (n_nationkey); -- 8,9也用
+-- 8  
+CREATE INDEX i8_1 ON orders (o_orderdate, o_orderkey, o_custkey) WHERE o_orderdate BETWEEN DATE '1995-01-01' AND DATE '1996-12-31';
+create index i8_2 on part (p_partkey) where p_type = 'ECONOMY BRUSHED BRASS';
+--CREATE INDEX i8_3 ON lineitem (l_orderkey, l_partkey, l_suppkey); --12-20修改，测试一下
+CREATE INDEX i8_4 ON customer (c_custkey, c_nationkey);
+
+-- 9
+CREATE EXTENSION pg_trgm;
+--create index i9_1 on part (p_partkey) where p_name like '%sandy%';
+CREATE INDEX i9_2 ON part USING gin(p_name gin_trgm_ops);
+
+-- 10 
+create index i10_1 on lineitem (l_orderkey) include (l_extendedprice,l_discount) where l_returnflag = 'R';
+create index i10_2 on orders (o_orderkey) include (o_custkey) where o_orderdate >= date '1993-12-01' and o_orderdate < date '1994-3-01';
+
+-- 12
+CREATE INDEX i12_1 ON lineitem (l_commitdate) INCLUDE (l_shipmode,l_shipdate, l_receiptdate,l_orderkey) WHERE l_receiptdate >= DATE '1996-01-01' AND l_receiptdate < DATE '1997-01-01';
+
+-- 14
+create index i14_1 on lineitem(l_partkey) include (l_extendedprice,l_discount) where l_shipdate >= date '1996-07-01' and l_shipdate < date '1996-08-01';
+
+-- 15
+CREATE INDEX i15_1 ON lineitem (l_suppkey) INCLUDE (l_extendedprice, l_discount) WHERE l_shipdate >= DATE '1996-09-01' AND l_shipdate < DATE '1996-12-01';
+-- 17
+create index i17_1 on part (p_partkey) where p_brand = 'Brand#35' and p_container = 'JUMBO PKG';
+create index i17_2 on lineitem (l_partkey) include (l_quantity,l_extendedprice);
+
+-- 18
+create index i18_1 on lineitem (l_orderkey) include (l_quantity);
+
+-- 20
+create index i20_1 on lineitem (l_partkey,l_suppkey) where l_shipdate >= date '1997-01-01' and l_shipdate < date '1998-01-01';
+create index i20_2 on part (p_partkey) where p_name like 'wheat%';
+
+-- 21
+create index i21_1 on lineitem (l_orderkey) include (l_suppkey) where l_receiptdate <> l_commitdate;
+create index i21_2 on lineitem (l_orderkey) include (l_suppkey);
+create index i21_3 on orders (o_orderkey) where o_orderstatus = 'F';
+
+
